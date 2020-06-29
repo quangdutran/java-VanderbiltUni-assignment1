@@ -25,6 +25,8 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.magnum.dataup.model.Video;
 
@@ -65,6 +67,32 @@ public class VideoFileManager {
 		assert(v != null);
 		
 		return targetDir_.resolve("video"+v.getId()+".mpg");
+	}
+
+	public static List<Long> getCurrentVideoIDList() {
+		List<Long> result = new ArrayList<>();
+		try {
+			Path targetDir_ = Paths.get("videos");
+			if(!Files.exists(targetDir_)){
+				Files.createDirectories(targetDir_);
+			}
+			Files.walk(targetDir_)
+					.filter(Files::isRegularFile)
+					.map(Path::toFile)
+					.forEach(f -> result.add(getIDFromString(f.getName())));
+		} catch (Exception e) {
+
+		}
+		return result;
+	}
+
+	private static long getIDFromString(String name) {
+		if (!name.contains(".")) {
+			return 0;
+		} else {
+			String [] splitName = name.split(".");
+			return Long.parseLong(splitName[0].substring(4));
+		}
 	}
 	
 	/**
